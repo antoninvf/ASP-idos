@@ -1,0 +1,59 @@
+﻿@using ASP_idos.Repository
+@{
+    ViewData["Title"] = "Lines";
+    StopRepository stopRepository = new StopRepository();
+}
+
+<div class="d-flex flex-column">
+    <div class="mb-3 w-25">
+        <form method="post" asp-controller="Home" asp-action="Lines">
+            @using (Html.BeginForm())
+            {
+                <div>
+                    🔍 Search: @Html.TextBox("SearchInput")
+                    <input class="btn btn-primary mt-3 " type="submit" value="Search"/>
+                </div>
+            }
+        </form>
+    </div>
+    <table class="table w-100">
+        <thead>
+        <tr>
+            <th scope="col">Line Number</th>
+            <th scope="col">Stops with this Line</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                @if (ViewData["SearchInput"] is null)
+                {
+                    @foreach(var line in stopRepository.GetAllLines())
+                    {
+                        <div>@line.GetLineType() @line.Name</div>
+                    }
+                }
+                else
+                {
+                    @stopRepository.GetLineBy(ViewData["SearchInput"])?.GetLineEmoji()
+                }
+            </td>
+            <td>
+                @if (ViewData["SearchInput"] is null)
+                {
+                    <div>Only displayed while searching...</div>
+                }
+                else
+                {
+                    @foreach (var stop in stopRepository.GetStopGroupsByLine(stopRepository.GetLineBy(ViewData["SearchInput"])))
+                    {
+                        <div class="border border-1 p-2 m-2">
+                            <div>@stop.Name</div>
+                        </div>
+                    }
+                }
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

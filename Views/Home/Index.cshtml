@@ -1,0 +1,59 @@
+﻿@using ASP_idos.Repository
+@{
+    ViewData["Title"] = "Stops";
+    StopRepository stopRepository = new StopRepository();
+}
+
+<div class="d-flex flex-column">
+    <div class="mb-3 w-50">
+        <form method="post" asp-controller="Home" asp-action="Index">
+            @using (Html.BeginForm())
+            {
+                <div class="d-flex gap-2">
+                    <div>@Html.TextBox("SearchInput", null, new { @class = "form-control"})</div>
+                    <input class="btn btn-primary" type="submit" value="Search"/>
+                    @if(ViewData["SearchInput"] is null)
+                    {
+                        <button class="btn btn-outline-primary">Previous Page</button>
+                        <button class="btn btn-outline-primary">Next Page</button>
+                    }
+                </div>
+            }
+        </form>
+    </div>
+    <table class="table w-100">
+        <thead>
+        <tr>
+            <th scope="col">Stop Name</th>
+            <th scope="col">Stop Info</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var stopGroup in stopRepository.GetStopGroupsBy(ViewData["SearchInput"]))
+        {
+            <tr>
+                <td>@stopGroup.Name</td>
+                <td>
+                    <b>@stopGroup.Stops.Count stop(s)</b>
+                    @foreach (var stop in stopGroup.Stops)
+                    {
+                        <div class="border border-1 p-2 m-2">
+                            <div>@stop.AltIdosName - @stop.Platform</div>
+                            <ul>
+                                @foreach (var line in stop.Lines)
+                                {
+                                    <li>@line.GetLineEmoji() @line.Name</li>
+                                    @foreach (var direction in line.Directions)
+                                    {
+                                        <div>- @direction</div>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
